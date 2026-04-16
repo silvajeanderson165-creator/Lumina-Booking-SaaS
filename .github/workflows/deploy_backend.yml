@@ -1,0 +1,41 @@
+name: Deploy Backend to IaaS
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'backend/**'
+      - 'docker-compose.prod.yml'
+
+jobs:
+  deploy:
+    name: Deploy to Production VM (EC2/Droplet)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.PROD_SERVER_IP }}
+          username: ${{ secrets.PROD_SERVER_USER }}
+          key: ${{ secrets.PROD_SSH_PRIVATE_KEY }}
+          script: |
+            cd /opt/lumina-saas
+            # O repositório já deve estar clonado no servidor. Puxa as atualizações:
+            git pull origin main
+            
+            # Reconstrói a imagem sem downtime agressivo, mas garantindo atualização
+            docker-compose -f docker-compose.prod.yml build
+            
+            # Recria contêineres que tiveram alterações. 'up -d' lidará com down e up
+            docker-compose -f docker-compose.prod.yml up -d
+            
+            # Executa as migrações (se houver) automáticas diretamente no gunicorn container
+            docker-compose -f docker-compose.prod.yml exec -T web python manage.py migrate --noinput
+            
+            # Limpeza de imagens Docker sem uso (Dangling) para poupar disco da Droplet (ex de VLAEG autocura)
+            docker image prune -f

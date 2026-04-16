@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: lumina_postgres_prod
+    environment:
+      POSTGRES_DB: lumina_prod
+      POSTGRES_USER: ${PROD_DB_USER:-lumina_admin}
+      POSTGRES_PASSWORD: ${PROD_DB_PASSWORD:-securepassword123}
+    volumes:
+      - postgres_prod_data:/var/lib/postgresql/data
+    restart: always # Auto-restart no caso de reboot da Droplet/EC2
+    networks:
+      - lumina_prod_network
+
+  web:
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: lumina_django_backend_prod
+    command: gunicorn core.wsgi:application --bind 0.0.0.0:8000 --workers 3 --threads 2
+    volumes:
+      - static_volume:/app/staticfiles
+      # IMPORTANTE: Sem mapeamento direto de código (./backend:/app) em produção! 
+      # O código foi "bakado" dentro da imagem durante o build do CI/CD.
+    ports:
+      - "8000:8000"
+    environment:
+      - SECRET_KEY=${PROD_SECRET_KEY}
+      - DEBUG=False # Crítico na AWS/Droplet
+      - ALLOWED_HOSTS=${ALLOWED_PROD_HOSTS:-*}
+      - DATABASE_URL=postgres://${PROD_DB_USER:-lumina_admin}:${PROD_DB_PASSWORD:-securepassword123}@db:5432/lumina_prod
+    depends_on:
+      - db
+    restart: always
+    networks:
+      - lumina_prod_network
+
+volumes:
+  postgres_prod_data:
+  static_volume:
+
+networks:
+  lumina_prod_network:
+    driver: bridge

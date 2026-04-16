@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: lumina_postgres_db
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-lumina_analytics}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres_password}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    networks:
+      - lumina_network
+
+  web:
+    build: ./backend
+    container_name: lumina_django_backend
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./backend:/app
+    ports:
+      - "8000:8000"
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB:-lumina_analytics}
+      - POSTGRES_USER=${POSTGRES_USER:-postgres}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres_password}
+      - POSTGRES_HOST=db
+      - POSTGRES_PORT=5432
+      - DEBUG=1
+    depends_on:
+      - db
+    restart: unless-stopped
+    networks:
+      - lumina_network
+
+volumes:
+  postgres_data:
+
+networks:
+  lumina_network:
+    driver: bridge
