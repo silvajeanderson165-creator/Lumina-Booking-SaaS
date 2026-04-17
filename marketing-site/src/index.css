@@ -1,0 +1,253 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+@layer base {
+  :root {
+    --background: 220 20% 4%;
+    --foreground: 0 0% 98%;
+    --card: 220 15% 8%;
+    --card-foreground: 0 0% 98%;
+    --popover: 220 15% 8%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 180 100% 50%;
+    --primary-foreground: 220 20% 4%;
+    --secondary: 260 100% 60%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 220 10% 15%;
+    --muted-foreground: 220 10% 60%;
+    --accent: 180 100% 50%;
+    --accent-foreground: 220 20% 4%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 220 10% 20%;
+    --input: 220 10% 20%;
+    --ring: 180 100% 50%;
+    --radius: 0.75rem;
+    
+    /* Lumina Custom Colors */
+    --lumina-cyan: 180 100% 50%;
+    --lumina-purple: 260 100% 60%;
+    --lumina-pink: 320 100% 60%;
+    --lumina-gold: 45 100% 55%;
+    --lumina-dark: 220 20% 4%;
+    --lumina-darker: 220 25% 2%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background: hsl(var(--lumina-darker));
+    overflow-x: hidden;
+  }
+}
+
+@layer utilities {
+  /* Gradient Text */
+  .gradient-text {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(135deg, 
+      hsl(180 100% 50%) 0%, 
+      hsl(260 100% 60%) 50%, 
+      hsl(320 100% 60%) 100%
+    );
+  }
+  
+  .gradient-text-cyan {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(135deg, 
+      hsl(180 100% 60%) 0%, 
+      hsl(180 100% 40%) 100%
+    );
+  }
+  
+  /* Glow Effects */
+  .glow-cyan {
+    box-shadow: 
+      0 0 20px hsl(180 100% 50% / 0.3),
+      0 0 40px hsl(180 100% 50% / 0.2),
+      0 0 60px hsl(180 100% 50% / 0.1);
+  }
+  
+  .glow-purple {
+    box-shadow: 
+      0 0 20px hsl(260 100% 60% / 0.3),
+      0 0 40px hsl(260 100% 60% / 0.2),
+      0 0 60px hsl(260 100% 60% / 0.1);
+  }
+  
+  .glow-text-cyan {
+    text-shadow: 
+      0 0 10px hsl(180 100% 50% / 0.5),
+      0 0 20px hsl(180 100% 50% / 0.3),
+      0 0 30px hsl(180 100% 50% / 0.2);
+  }
+  
+  /* Gradient Backgrounds */
+  .bg-gradient-radial {
+    background: radial-gradient(ellipse at center, 
+      hsl(260 100% 60% / 0.15) 0%, 
+      transparent 70%);
+  }
+  
+  .bg-gradient-hero {
+    background: 
+      radial-gradient(ellipse 80% 50% at 50% -20%, hsl(260 100% 60% / 0.3), transparent),
+      radial-gradient(ellipse 60% 40% at 80% 50%, hsl(180 100% 50% / 0.1), transparent),
+      radial-gradient(ellipse 60% 40% at 20% 80%, hsl(320 100% 60% / 0.1), transparent),
+      hsl(var(--lumina-darker));
+  }
+  
+  /* Glass Effect */
+  .glass {
+    background: hsl(220 15% 8% / 0.7);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid hsl(220 10% 20% / 0.5);
+  }
+  
+  .glass-card {
+    background: linear-gradient(135deg, 
+      hsl(220 15% 10% / 0.8) 0%, 
+      hsl(220 15% 6% / 0.9) 100%);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid hsl(220 10% 20% / 0.3);
+  }
+  
+  /* Button Gradients */
+  .btn-gradient {
+    background: linear-gradient(135deg, 
+      hsl(180 100% 50%) 0%, 
+      hsl(260 100% 60%) 100%);
+    transition: all 0.3s ease;
+  }
+  
+  .btn-gradient:hover {
+    background: linear-gradient(135deg, 
+      hsl(180 100% 55%) 0%, 
+      hsl(260 100% 65%) 100%);
+    box-shadow: 
+      0 0 30px hsl(180 100% 50% / 0.4),
+      0 0 60px hsl(260 100% 60% / 0.2);
+    transform: translateY(-2px);
+  }
+  
+  /* Animated Border */
+  .animated-border {
+    position: relative;
+  }
+  
+  .animated-border::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    background: linear-gradient(90deg, 
+      hsl(180 100% 50%), 
+      hsl(260 100% 60%), 
+      hsl(320 100% 60%), 
+      hsl(180 100% 50%));
+    background-size: 300% 100%;
+    border-radius: inherit;
+    z-index: -1;
+    animation: borderRotate 3s linear infinite;
+  }
+  
+  @keyframes borderRotate {
+    0% { background-position: 0% 50%; }
+    100% { background-position: 300% 50%; }
+  }
+  
+  /* Pulse Glow */
+  .pulse-glow {
+    animation: pulseGlow 2s ease-in-out infinite;
+  }
+  
+  @keyframes pulseGlow {
+    0%, 100% { 
+      box-shadow: 0 0 20px hsl(180 100% 50% / 0.3);
+    }
+    50% { 
+      box-shadow: 0 0 40px hsl(180 100% 50% / 0.5);
+    }
+  }
+  
+  /* Float Animation */
+  .float {
+    animation: float 6s ease-in-out infinite;
+  }
+  
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-20px); }
+  }
+  
+  /* Shimmer Effect */
+  .shimmer {
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      hsl(180 100% 50% / 0.1) 50%,
+      transparent 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 2s infinite;
+  }
+  
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+  
+  /* Grid Pattern */
+  .grid-pattern {
+    background-image: 
+      linear-gradient(hsl(220 10% 20% / 0.3) 1px, transparent 1px),
+      linear-gradient(90deg, hsl(220 10% 20% / 0.3) 1px, transparent 1px);
+    background-size: 50px 50px;
+  }
+  
+  /* Noise Texture */
+  .noise {
+    position: relative;
+  }
+  
+  .noise::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    opacity: 0.03;
+    pointer-events: none;
+  }
+  
+  /* Scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: hsl(var(--lumina-darker));
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: hsl(220 10% 20%);
+    border-radius: 4px;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(180 100% 50% / 0.5);
+  }
+}

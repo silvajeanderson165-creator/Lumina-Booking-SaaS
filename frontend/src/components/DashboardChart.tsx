@@ -1,4 +1,4 @@
-import React from 'react';
+
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 interface ChartData {
@@ -54,15 +54,15 @@ export function DashboardChart({ data, isLoading = false }: DashboardChartProps)
   return (
     <div className="glass-panel chart-section animate-fade-in">
       <div className="chart-header">
-        <div className="chart-title">Revenue Dynamics</div>
+        <div className="chart-title">Dinâmica de Receita</div>
         <div className="chart-legend">
           <div className="legend-item">
             <span className="legend-dot mrr"></span>
-            <span>Monthly Recurring Revenue</span>
+            <span>Receita Recorrente Mensal (MRR)</span>
           </div>
           <div className="legend-item">
             <span className="legend-dot churn"></span>
-            <span>Churned Revenue</span>
+            <span>Receita Perdida (Churn)</span>
           </div>
         </div>
       </div>
@@ -109,7 +109,7 @@ export function DashboardChart({ data, isLoading = false }: DashboardChartProps)
               strokeWidth={3}
               fillOpacity={1} 
               fill="url(#colorMrr)" 
-              activeDot={{ r: 6, fill: 'var(--accent-cyan)', stroke: '#fff', strokeWidth: 2, boxShadow: '0 0 15px var(--accent-cyan)' }}
+              activeDot={{ r: 6, fill: 'var(--accent-cyan)', stroke: '#fff', strokeWidth: 2 }}
             />
             <Area 
               type="monotone" 
@@ -119,7 +119,7 @@ export function DashboardChart({ data, isLoading = false }: DashboardChartProps)
               strokeWidth={3}
               fillOpacity={1} 
               fill="url(#colorChurn)" 
-              activeDot={{ r: 6, fill: 'var(--accent-purple)', stroke: '#fff', strokeWidth: 2, boxShadow: '0 0 15px var(--accent-purple)' }}
+              activeDot={{ r: 6, fill: 'var(--accent-purple)', stroke: '#fff', strokeWidth: 2 }}
             />
           </AreaChart>
         </ResponsiveContainer>
