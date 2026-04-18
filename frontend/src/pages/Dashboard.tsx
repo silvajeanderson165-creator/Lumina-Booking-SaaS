@@ -116,16 +116,26 @@ function Dashboard() {
           <h1 className="dashboard-title text-gradient">Métricas Financeiras</h1>
         </div>
         
-        <div className="filter-bar glass-panel" style={{ padding: '0.25rem' }}>
-          {['Últimos 30 Dias', 'Últimos 12 Meses', 'Todo o Histórico'].map((filter) => (
-            <button
-              key={filter}
-              className={`filter-btn ${timeFilter === filter ? 'active' : ''}`}
-              onClick={() => handleFilterClick(filter)}
-            >
-              {filter}
-            </button>
-          ))}
+        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+          <div className="filter-bar glass-panel" style={{ padding: '0.25rem' }}>
+            {['Últimos 30 Dias', 'Últimos 12 Meses', 'Todo o Histórico'].map((filter) => (
+              <button
+                key={filter}
+                className={`filter-btn ${timeFilter === filter ? 'active' : ''}`}
+                onClick={() => handleFilterClick(filter)}
+              >
+                {filter}
+              </button>
+            ))}
+          </div>
+          <button 
+            className="demo-btn-primary animate-pulse-glow"
+            style={{ padding: '0.6rem 1.2rem', display: 'flex', gap: '0.5rem', alignItems: 'center', fontWeight: 'bold' }}
+            onClick={() => alert('Fluxo de Integração (Stripe/Hotmart) será iniciado...')}
+          >
+            <Activity size={18} />
+            Conectar minha operação
+          </button>
         </div>
       </header>
 
