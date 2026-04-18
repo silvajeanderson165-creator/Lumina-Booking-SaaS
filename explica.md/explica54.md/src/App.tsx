@@ -1,15 +1,14 @@
 import { motion } from 'framer-motion';
-import '../compiled-showcase.css';
-import NeuralBackground from '../components/showcase/NeuralBackground';
-import Header from '../components/showcase/Header';
-import PipelineNodes from '../components/showcase/PipelineNodes';
-import StageCard from '../components/showcase/StageCard';
-import DataFlowVisualization from '../components/showcase/DataFlowVisualization';
-import MetricsRow from '../components/showcase/MetricsRow';
-import LiveLog from '../components/showcase/LiveLog';
-import ArchitectureSteps from '../components/showcase/ArchitectureSteps';
-import TechTags from '../components/showcase/TechTags';
-import FooterCTA from '../components/showcase/FooterCTA';
+import NeuralBackground from './components/NeuralBackground';
+import Header from './components/Header';
+import PipelineNodes from './components/PipelineNodes';
+import StageCard from './components/StageCard';
+import DataFlowVisualization from './components/DataFlowVisualization';
+import MetricsRow from './components/MetricsRow';
+import LiveLog from './components/LiveLog';
+import ArchitectureSteps from './components/ArchitectureSteps';
+import TechTags from './components/TechTags';
+import FooterCTA from './components/FooterCTA';
 import { Shield, Link2, CloudDownload, Zap } from 'lucide-react';
 
 const stages = [
@@ -18,7 +17,7 @@ const stages = [
     title: 'Multi-Tenant & Setup',
     description:
       'No momento em que o cliente decide avançar além da demonstração, isolamos o ambiente B2B. Nossa base em PostgreSQL aloca um tenant_id único garantindo que dados de diferentes empresas jamais se misturem (Enterprise Security Rules). O usuário cria a conta final recebendo painéis de autenticação criptografados via JWT Auth no nosso backend Django.',
-    code: "tenant_id = uuid4()\nclaims = {\n  'sub': str(tenant_id),\n  'iat': datetime.utcnow(),\n  'role': 'enterprise'\n}\ntoken = jwt.encode(claims, key, algorithm='HS256')",
+    code: "tenant_id = uuid4()\\nclaims = {\\n  'sub': str(tenant_id),\\n  'iat': datetime.utcnow(),\\n  'role': 'enterprise'\\n}\\ntoken = jwt.encode(claims, key, algorithm='HS256')",
     badge: '128 Tenants Ativos',
     icon: Shield,
     color: '#22D3EE',
@@ -28,7 +27,7 @@ const stages = [
     title: 'Handshake de APIs (Stripe / Hotmart)',
     description:
       'Em uma tela segura de Integrações, o cliente preenche chaves de API com permissão apenas de Leitura (Read-Only). O backend as valida instantaneamente trocando tokens criptográficos e confirma o Webhook para os pagamentos futuros. O Handshake avisa o sistema que agora temos permissão para acessar os dados na fonte.',
-    code: "# Validação de webhook Stripe\nevent = stripe.Webhook.construct_event(\n  payload=request.body,\n  sig_header=signature,\n  secret=endpoint_secret\n)\nprocess_payment_intent(event.data.object)",
+    code: "# Validação de webhook Stripe\\nevent = stripe.Webhook.construct_event(\\n  payload=request.body,\\n  sig_header=signature,\\n  secret=endpoint_secret\\n)\\nprocess_payment_intent(event.data.object)",
     badge: '2 APIs Conectadas',
     icon: Link2,
     color: '#A78BFA',
@@ -38,7 +37,7 @@ const stages = [
     title: 'Ingestão de Dados em Nuvem (Background Tasks)',
     description:
       'Como a primeira carga pode englobar milhares de pagamentos de anos anteriores, nós não podemos travar o site do cliente aguardando o fim do upload. O Django repassa esse trabalho sujo para mensagerias escaláveis frequentemente usando Celery e Redis. O cliente é liberado pra passear na plataforma enquanto um "progress bar" roda async puxando transações financeiras nos bastidores (IaaS).',
-    code: "@shared_task(bind=True, max_retries=3)\ndef sync_transactions(self, tenant_id, cursor=None):\n    batch = fetch_stripe_batch(cursor, limit=100)\n    if batch.has_more:\n        self.apply_async(\n            args=[tenant_id, batch.next_cursor],\n            countdown=5\n        )",
+    code: "@shared_task(bind=True, max_retries=3)\\ndef sync_transactions(self, tenant_id, cursor=None):\\n    batch = fetch_stripe_batch(cursor, limit=100)\\n    if batch.has_more:\\n        self.apply_async(\\n            args=[tenant_id, batch.next_cursor],\\n            countdown=5\\n        )",
     badge: '14.2K Transações sincronizadas',
     icon: CloudDownload,
     color: '#FBBF24',
@@ -48,14 +47,14 @@ const stages = [
     title: 'O Motor Analítico Entra em Ação',
     description:
       'Com a tabela Subscription totalmente alimentada do Stripe, disparamos consultas aggregation massivas direto no PostgreSQL para decodificar LTV verdadeiro e categorizar as perdas como Churn Voluntário (Insatisfação) e Involuntário (Cartão Falho).',
-    code: "SELECT \\\n  churn_type,\n  COUNT(*) as total,\n  AVG(lifetime_value) as avg_ltv,\n  DATE_TRUNC('month', churned_at) as month\nFROM subscriptions\nWHERE status = 'churned'\nGROUP BY churn_type, month\nORDER BY month DESC",
+    code: "SELECT \\\n  churn_type,\\n  COUNT(*) as total,\\n  AVG(lifetime_value) as avg_ltv,\\n  DATE_TRUNC('month', churned_at) as month\\nFROM subscriptions\\nWHERE status = 'churned'\\nGROUP BY churn_type, month\\nORDER BY month DESC",
     badge: '93.4% Precisão de Classificação',
     icon: Zap,
     color: '#4ADE80',
   },
 ];
 
-export default function IntegrationShowcase() {
+export default function App() {
   return (
     <div className="min-h-screen bg-[#030712] text-white relative overflow-x-hidden">
       {/* Neural Network Background */}
@@ -201,7 +200,7 @@ export default function IntegrationShowcase() {
 
         {/* Footer CTA */}
         <section className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
-          <div className="glass-card p-8 sm:p-12" style={{ background: 'rgba(17, 24, 39, 0.75)', backdropFilter: 'blur(20px)', border: '1px solid rgba(255, 255, 255, 0.06)', borderRadius: '16px' }}>
+          <div className="glass-card p-8 sm:p-12">
             <FooterCTA />
           </div>
         </section>
