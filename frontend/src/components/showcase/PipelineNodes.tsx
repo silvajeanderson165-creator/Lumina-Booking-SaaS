@@ -10,8 +10,8 @@ const stages = [
 
 export default function PipelineNodes() {
   return (
-    <div className="w-full max-w-4xl mx-auto">
-      <div className="flex items-center justify-center gap-1 sm:gap-4 w-full overflow-hidden">
+    <div className="w-full max-w-5xl mx-auto px-2 sm:px-4">
+      <div className="flex items-center justify-center gap-1 sm:gap-4 w-full">
         {stages.map((stage, index) => (
           <div key={stage.id} className="flex items-center gap-1 sm:gap-4">
             {/* Node */}
