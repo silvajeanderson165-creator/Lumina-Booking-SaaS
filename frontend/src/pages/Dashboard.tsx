@@ -54,15 +54,20 @@ function Dashboard() {
     // MODO PORTFÓLIO: Bypass de requisição GraphQL
     if (token === 'lumina_portfolio_demo') {
       setTimeout(() => {
-        setMetrics({
-          summary: {
-            mrr: 154500,
-            churnRate: 1.2,
-            voluntaryChurn: 0.8,
-            involuntaryChurn: 0.4,
-            ltv: 10555000 
-          },
-          timeline: [
+        let mockedSummary: any;
+        let mockedTimeline: any[] = [];
+
+        if (timeFilter === 'Últimos 30 Dias') {
+          mockedSummary = { mrr: 154500, churnRate: 0.8, voluntaryChurn: 0.6, involuntaryChurn: 0.2, ltv: 12500000 };
+          // Gera 30 dias de crescimento granular
+          for (let i = 1; i <= 30; i++) {
+            const mrr = 149000 + (i * 183.33); // sobe ate 154.5k
+            const churn = 100 + (Math.random() * 200);
+            mockedTimeline.push({ date: `2026-03-${i < 10 ? '0'+i : i}`, mrrValue: mrr, churnedAmount: churn });
+          }
+        } else if (timeFilter === 'Últimos 12 Meses') {
+          mockedSummary = { mrr: 154500, churnRate: 1.2, voluntaryChurn: 0.8, involuntaryChurn: 0.4, ltv: 10555000 };
+          mockedTimeline = [
             { date: "2025-05-01", mrrValue: 100000, churnedAmount: 500 },
             { date: "2025-06-01", mrrValue: 105000, churnedAmount: 1200 },
             { date: "2025-07-01", mrrValue: 110000, churnedAmount: 800 },
@@ -75,10 +80,28 @@ function Dashboard() {
             { date: "2026-02-01", mrrValue: 148000, churnedAmount: 1000 },
             { date: "2026-03-01", mrrValue: 151000, churnedAmount: 1200 },
             { date: "2026-04-01", mrrValue: 154500, churnedAmount: 900 }
-          ]
+          ];
+        } else {
+          mockedSummary = { mrr: 154500, churnRate: 1.45, voluntaryChurn: 0.9, involuntaryChurn: 0.55, ltv: 9800000 };
+          mockedTimeline = [
+            { date: "2024-04-01", mrrValue: 45000, churnedAmount: 200 },
+            { date: "2024-07-01", mrrValue: 60000, churnedAmount: 650 },
+            { date: "2024-10-01", mrrValue: 85000, churnedAmount: 800 },
+            { date: "2025-01-01", mrrValue: 92000, churnedAmount: 700 },
+            { date: "2025-04-01", mrrValue: 98000, churnedAmount: 1100 },
+            { date: "2025-07-01", mrrValue: 110000, churnedAmount: 800 },
+            { date: "2025-10-01", mrrValue: 130000, churnedAmount: 1500 },
+            { date: "2026-01-01", mrrValue: 142000, churnedAmount: 800 },
+            { date: "2026-04-01", mrrValue: 154500, churnedAmount: 900 }
+          ];
+        }
+
+        setMetrics({
+          summary: mockedSummary,
+          timeline: mockedTimeline
         });
         setIsLoading(false);
-      }, 600); // tempo para dar sensação de busca real
+      }, 500); // tempo para dar sensação de busca real
       return;
     }
 
