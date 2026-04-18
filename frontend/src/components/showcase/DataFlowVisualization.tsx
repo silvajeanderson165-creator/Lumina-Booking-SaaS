@@ -17,14 +17,15 @@ interface SystemNode {
   color: string;
   x: number;
   y: number;
+  w?: number;
 }
 
 const nodes: SystemNode[] = [
-  { id: 'stripe', icon: CreditCard, label: 'Stripe', color: '#4ADE80', x: 50, y: 50 },
-  { id: 'hotmart', icon: ShoppingBag, label: 'Hotmart', color: '#FBBF24', x: 50, y: 180 },
-  { id: 'gateway', icon: Shield, label: 'API Gateway', color: '#22D3EE', x: 280, y: 115 },
-  { id: 'postgres', icon: Database, label: 'PostgreSQL', color: '#A78BFA', x: 510, y: 115 },
-  { id: 'analytics', icon: BarChart3, label: 'Analytics', color: '#22D3EE', x: 740, y: 115 },
+  { id: 'stripe', icon: CreditCard, label: 'Stripe', color: '#4ADE80', x: 50, y: 50, w: 85 },
+  { id: 'hotmart', icon: ShoppingBag, label: 'Hotmart', color: '#FBBF24', x: 50, y: 180, w: 90 },
+  { id: 'gateway', icon: Shield, label: 'API Gateway', color: '#22D3EE', x: 280, y: 115, w: 110 },
+  { id: 'postgres', icon: Database, label: 'PostgreSQL', color: '#A78BFA', x: 510, y: 115, w: 105 },
+  { id: 'analytics', icon: BarChart3, label: 'Analytics', color: '#22D3EE', x: 740, y: 115, w: 95 },
 ];
 
 const connections = [
@@ -48,7 +49,7 @@ export default function DataFlowVisualization() {
   const getPathD = (fromId: string, toId: string) => {
     const from = nodes.find((n) => n.id === fromId)!;
     const to = nodes.find((n) => n.id === toId)!;
-    return `M ${from.x + 40} ${from.y + 20} L ${to.x} ${to.y + 20}`;
+    return `M ${from.x + (from.w || 80)} ${from.y + 20} L ${to.x} ${to.y + 20}`;
   };
 
   // Spawn packets periodically
@@ -196,7 +197,7 @@ export default function DataFlowVisualization() {
                 <rect
                   x={node.x - 4}
                   y={node.y - 4}
-                  width={88}
+                  width={(node.w || 80) + 8}
                   height={48}
                   rx={12}
                   fill={node.color}
@@ -206,7 +207,7 @@ export default function DataFlowVisualization() {
                 <rect
                   x={node.x}
                   y={node.y}
-                  width={80}
+                  width={node.w || 80}
                   height={40}
                   rx={10}
                   fill="#111827"
