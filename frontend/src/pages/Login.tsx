@@ -4,8 +4,10 @@ import { ParticleNetwork } from '../components/ParticleNetwork';
 import './Login.css';
 
 export default function Login() {
+  const [isRegister, setIsRegister] = useState(false);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -15,12 +17,26 @@ export default function Login() {
     e.preventDefault();
     
     if (!username || !password) {
-        setError('Por favor, preencha todos os campos');
+        setError('Por favor, preencha todos os campos obrigatórios.');
+        return;
+    }
+
+    if (isRegister && password !== confirmPassword) {
+        setError('As chaves de acesso não coincidem.');
         return;
     }
 
     setIsLoading(true);
     setError(null);
+
+    // MODO PORTFÓLIO: Bypass de Criação de Conta
+    if (isRegister) {
+      setTimeout(() => {
+        localStorage.setItem('lumina_token', 'lumina_portfolio_demo');
+        navigate('/dashboard');
+      }, 1500);
+      return;
+    }
 
     const query = `
       mutation TokenAuth($username: String!, $password: String!) {
@@ -59,23 +75,17 @@ export default function Login() {
 
   return (
     <div className="login-wrapper">
-      {/* Sistema de Partículas Modificado (Exclusivo Login) */}
       <ParticleNetwork />
-      
-      {/* Camadas de gradiente animadas */}
       <div className="gradient-layer layer-1"></div>
       <div className="gradient-layer layer-2"></div>
       <div className="gradient-layer layer-3"></div>
 
-      {/* Container do Login */}
       <div className="login-container">
-        {/* Badge de Status */}
         <div className="status-badge">
           <span className="pulse-dot"></span>
-          <span className="badge-text">ÁREA RESTRITA</span>
+          <span className="badge-text">{isRegister ? "CRIAÇÃO DE ACESSO" : "ÁREA RESTRITA"}</span>
         </div>
 
-        {/* Logo e Título */}
         <div className="header">
           <div className="logo-container">
             <svg className="logo-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -91,10 +101,11 @@ export default function Login() {
             </svg>
             <h1 className="logo-text">Lumina</h1>
           </div>
-          <p className="subtitle">Autenticação do Sistema Core</p>
+          <p className="subtitle">
+            {isRegister ? "Conecte sua empresa ao motor financeiro" : "Autenticação do Sistema Core"}
+          </p>
         </div>
 
-        {/* Formulário */}
         <form id="loginForm" className="login-form" onSubmit={handleLogin}>
           
           {error && (
@@ -108,9 +119,10 @@ export default function Login() {
             </div>
           )}
 
-          {/* Campo Usuário */}
           <div className="input-group">
-            <label htmlFor="username" className="input-label">Usuário</label>
+            <label htmlFor="username" className="input-label">
+              {isRegister ? "Nome da Empresa ou E-mail" : "Usuário ou E-mail"}
+            </label>
             <div className="input-wrapper">
               <svg className="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                 <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
@@ -120,7 +132,7 @@ export default function Login() {
                 type="text" 
                 id="username" 
                 name="username"
-                placeholder="Digite seu usuário"
+                placeholder={isRegister ? "Sua Empresa S.A." : "Digite seu usuário"}
                 autoComplete="username"
                 value={username}
                 onChange={(e) => {
@@ -132,7 +144,6 @@ export default function Login() {
             </div>
           </div>
 
-          {/* Campo Senha */}
           <div className="input-group">
             <label htmlFor="password" className="input-label">Chave de Acesso</label>
             <div className="input-wrapper">
@@ -145,7 +156,7 @@ export default function Login() {
                 id="password" 
                 name="password"
                 placeholder="••••••••"
-                autoComplete="current-password"
+                autoComplete={isRegister ? "new-password" : "current-password"}
                 value={password}
                 onChange={(e) => {
                     setPassword(e.target.value);
@@ -174,23 +185,50 @@ export default function Login() {
             </div>
           </div>
 
-          {/* Opções */}
-          <div className="form-options">
-            <label className="checkbox-container">
-              <input type="checkbox" id="rememberMe" />
-              <span className="checkmark"></span>
-              <span className="checkbox-label">Lembrar-me</span>
-            </label>
-            <a href="#" className="forgot-link">Esqueceu a senha?</a>
+          {isRegister && (
+            <div className="input-group">
+              <label htmlFor="confirmPassword" className="input-label">Confirmar Chave de Acesso</label>
+              <div className="input-wrapper">
+                <svg className="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                </svg>
+                <input 
+                  type={showPassword ? "text" : "password"}
+                  id="confirmPassword" 
+                  name="confirmPassword"
+                  placeholder="••••••••"
+                  autoComplete="new-password"
+                  value={confirmPassword}
+                  onChange={(e) => {
+                      setConfirmPassword(e.target.value);
+                      if(error) setError(null);
+                  }}
+                  required
+                />
+              </div>
+            </div>
+          )}
+
+          <div className="form-options" style={{ marginTop: isRegister ? '0' : ''}}>
+            {!isRegister && (
+              <>
+                <label className="checkbox-container">
+                  <input type="checkbox" id="rememberMe" />
+                  <span className="checkmark"></span>
+                  <span className="checkbox-label">Lembrar-me</span>
+                </label>
+                <a href="#" className="forgot-link">Esqueceu a senha?</a>
+              </>
+            )}
           </div>
 
-          {/* Botão de Submit */}
           <button type="submit" className={`submit-btn ${isLoading ? 'loading' : ''}`} disabled={isLoading}>
-            {!isLoading && <span className="btn-text">Acessar Engine</span>}
+            {!isLoading && <span className="btn-text">{isRegister ? "Criar Conta Válida" : "Acessar Engine"}</span>}
             {isLoading && (
               <span className="btn-loader">
                 <span className="spinner"></span>
-                Autenticando...
+                {isRegister ? "Criando Operação..." : "Autenticando..."}
               </span>
             )}
             {!isLoading && (
@@ -200,9 +238,37 @@ export default function Login() {
               </svg>
             )}
           </button>
+          
+          <div style={{ textAlign: 'center', marginTop: '1.5rem' }}>
+            <button 
+              type="button"
+              className="toggle-auth-btn"
+              onClick={() => {
+                setIsRegister(!isRegister);
+                setError(null);
+                setUsername('');
+                setPassword('');
+                setConfirmPassword('');
+              }}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: 'var(--text-secondary)',
+                fontSize: '0.85rem',
+                cursor: 'pointer',
+                textDecoration: 'underline',
+                textUnderlineOffset: '4px',
+                transition: 'color 0.2s',
+                fontFamily: 'inherit'
+              }}
+              onMouseOver={(e) => e.currentTarget.style.color = '#fff'}
+              onMouseOut={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}
+            >
+              {isRegister ? "Já possui uma conta? Fazer Login" : "Demonstração: Criar acesso de portfólio"}
+            </button>
+          </div>
         </form>
 
-        {/* Footer */}
         <div className="footer">
           <div className="security-badge">
             <svg className="shield-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">

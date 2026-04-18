@@ -49,6 +49,39 @@ function Dashboard() {
     setError(null);
     const { startDate, endDate } = getFilterDates(timeFilter);
 
+    const token = localStorage.getItem('lumina_token');
+    
+    // MODO PORTFÓLIO: Bypass de requisição GraphQL
+    if (token === 'lumina_portfolio_demo') {
+      setTimeout(() => {
+        setMetrics({
+          summary: {
+            mrr: 154500,
+            churnRate: 1.2,
+            voluntaryChurn: 0.8,
+            involuntaryChurn: 0.4,
+            ltv: 10555000 
+          },
+          timeline: [
+            { date: "2025-05-01", mrrValue: 100000, churnedAmount: 500 },
+            { date: "2025-06-01", mrrValue: 105000, churnedAmount: 1200 },
+            { date: "2025-07-01", mrrValue: 110000, churnedAmount: 800 },
+            { date: "2025-08-01", mrrValue: 115000, churnedAmount: 1100 },
+            { date: "2025-09-01", mrrValue: 122000, churnedAmount: 900 },
+            { date: "2025-10-01", mrrValue: 130000, churnedAmount: 1500 },
+            { date: "2025-11-01", mrrValue: 133000, churnedAmount: 1000 },
+            { date: "2025-12-01", mrrValue: 138000, churnedAmount: 1300 },
+            { date: "2026-01-01", mrrValue: 142000, churnedAmount: 800 },
+            { date: "2026-02-01", mrrValue: 148000, churnedAmount: 1000 },
+            { date: "2026-03-01", mrrValue: 151000, churnedAmount: 1200 },
+            { date: "2026-04-01", mrrValue: 154500, churnedAmount: 900 }
+          ]
+        });
+        setIsLoading(false);
+      }, 600); // tempo para dar sensação de busca real
+      return;
+    }
+
     const query = `
       query GetDashboardMetrics($startDate: String!, $endDate: String!) {
         dashboardMetrics(startDate: $startDate, endDate: $endDate) {
@@ -70,8 +103,6 @@ function Dashboard() {
 
     const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000/graphql';
 
-    const token = localStorage.getItem('lumina_token');
-    
     fetch(apiUrl, {
       method: 'POST',
       headers: { 
