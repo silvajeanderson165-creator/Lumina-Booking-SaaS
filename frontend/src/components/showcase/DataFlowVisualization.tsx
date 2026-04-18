@@ -108,7 +108,7 @@ export default function DataFlowVisualization() {
       {/* SVG Diagram */}
       <div className="relative w-full overflow-x-auto">
         <svg
-          viewBox="0 0 820 240"
+          viewBox="0 0 860 240"
           className="w-full min-w-[600px]"
           style={{ height: '240px' }}
         >
