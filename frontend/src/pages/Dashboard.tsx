@@ -59,39 +59,42 @@ function Dashboard() {
 
         if (timeFilter === 'Últimos 30 Dias') {
           mockedSummary = { mrr: 1745675, churnRate: 0.8, voluntaryChurn: 0.6, involuntaryChurn: 0.2, ltv: 32500000 };
-          // Gera 30 dias de crescimento granular
+          // Gera 30 dias de crescimento com leve variação
           for (let i = 1; i <= 30; i++) {
-            const mrr = 1700000 + (i * 1522.5); // sobe ate 1.74M
-            const churn = 1000 + (Math.random() * 500);
+            const baseMrr = 1700000 + (i * 1522.5);
+            // Adiciona oscilação para remover a linearidade perfeita
+            const oscillation = Math.sin(i * 0.5) * 8000 + (Math.random() * 6000 - 3000); 
+            const mrr = baseMrr + oscillation;
+            const churn = 1000 + (Math.random() * 800) + (Math.cos(i) * 300);
             mockedTimeline.push({ date: `2026-03-${i < 10 ? '0'+i : i}`, mrrValue: mrr, churnedAmount: churn });
           }
         } else if (timeFilter === 'Últimos 12 Meses') {
           mockedSummary = { mrr: 1745675, churnRate: 1.2, voluntaryChurn: 0.8, involuntaryChurn: 0.4, ltv: 28555000 };
           mockedTimeline = [
             { date: "2025-05-01", mrrValue: 1000000, churnedAmount: 5000 },
-            { date: "2025-06-01", mrrValue: 1050000, churnedAmount: 12000 },
-            { date: "2025-07-01", mrrValue: 1100000, churnedAmount: 8000 },
-            { date: "2025-08-01", mrrValue: 1150000, churnedAmount: 11000 },
-            { date: "2025-09-01", mrrValue: 1220000, churnedAmount: 9000 },
-            { date: "2025-10-01", mrrValue: 1300000, churnedAmount: 15000 },
-            { date: "2025-11-01", mrrValue: 1400000, churnedAmount: 10000 },
-            { date: "2025-12-01", mrrValue: 1480000, churnedAmount: 13000 },
-            { date: "2026-01-01", mrrValue: 1550000, churnedAmount: 8000 },
-            { date: "2026-02-01", mrrValue: 1610000, churnedAmount: 10000 },
-            { date: "2026-03-01", mrrValue: 1680000, churnedAmount: 12000 },
+            { date: "2025-06-01", mrrValue: 1080000, churnedAmount: 14000 },
+            { date: "2025-07-01", mrrValue: 1050000, churnedAmount: 8000 },
+            { date: "2025-08-01", mrrValue: 1190000, churnedAmount: 11000 },
+            { date: "2025-09-01", mrrValue: 1160000, churnedAmount: 9000 },
+            { date: "2025-10-01", mrrValue: 1290000, churnedAmount: 18000 },
+            { date: "2025-11-01", mrrValue: 1450000, churnedAmount: 10000 },
+            { date: "2025-12-01", mrrValue: 1420000, churnedAmount: 15000 },
+            { date: "2026-01-01", mrrValue: 1580000, churnedAmount: 8000 },
+            { date: "2026-02-01", mrrValue: 1550000, churnedAmount: 12000 },
+            { date: "2026-03-01", mrrValue: 1710000, churnedAmount: 12000 },
             { date: "2026-04-01", mrrValue: 1745675, churnedAmount: 9000 }
           ];
         } else {
           mockedSummary = { mrr: 1745675, churnRate: 1.45, voluntaryChurn: 0.9, involuntaryChurn: 0.55, ltv: 45800000 };
           mockedTimeline = [
             { date: "2024-04-01", mrrValue: 450000, churnedAmount: 2000 },
-            { date: "2024-07-01", mrrValue: 600000, churnedAmount: 6500 },
-            { date: "2024-10-01", mrrValue: 850000, churnedAmount: 8000 },
-            { date: "2025-01-01", mrrValue: 920000, churnedAmount: 7000 },
-            { date: "2025-04-01", mrrValue: 1000000, churnedAmount: 11000 },
-            { date: "2025-07-01", mrrValue: 1100000, churnedAmount: 8000 },
-            { date: "2025-10-01", mrrValue: 1300000, churnedAmount: 15000 },
-            { date: "2026-01-01", mrrValue: 1550000, churnedAmount: 8000 },
+            { date: "2024-07-01", mrrValue: 680000, churnedAmount: 9500 },
+            { date: "2024-10-01", mrrValue: 620000, churnedAmount: 8000 },
+            { date: "2025-01-01", mrrValue: 920000, churnedAmount: 12000 },
+            { date: "2025-04-01", mrrValue: 880000, churnedAmount: 11000 },
+            { date: "2025-07-01", mrrValue: 1150000, churnedAmount: 8000 },
+            { date: "2025-10-01", mrrValue: 1080000, churnedAmount: 19000 },
+            { date: "2026-01-01", mrrValue: 1520000, churnedAmount: 8000 },
             { date: "2026-04-01", mrrValue: 1745675, churnedAmount: 9000 }
           ];
         }
