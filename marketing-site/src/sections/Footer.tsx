@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Zap, Github, Linkedin, Mail, MessageCircle } from 'lucide-react';
+import { Github, Linkedin, Mail, MessageCircle } from 'lucide-react';
 
 
 const socialLinks = [
@@ -27,10 +27,17 @@ export function Footer() {
               className="flex items-center gap-2 mb-4"
               whileHover={{ scale: 1.02 }}
             >
-              <div className="relative w-10 h-10 flex items-center justify-center">
-                <div className="absolute inset-0 bg-gradient-to-br from-cyan-400 to-purple-500 rounded-lg" />
-                <Zap className="relative w-5 h-5 text-white" />
-              </div>
+              <svg className="w-8 h-8 group-hover:scale-110 transition-transform duration-300" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="url(#gradient-footer)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M2 17L12 22L22 17" stroke="url(#gradient-footer)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M2 12L12 17L22 12" stroke="url(#gradient-footer)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <defs>
+                  <linearGradient id="gradient-footer" x1="2" y1="2" x2="22" y2="22">
+                    <stop offset="0%" stopColor="#00d4ff"/>
+                    <stop offset="100%" stopColor="#667eea"/>
+                  </linearGradient>
+                </defs>
+              </svg>
               <span className="text-xl font-bold text-white">LUMINA</span>
             </motion.a>
             <p className="text-gray-400 text-sm mb-6 max-w-xs">
