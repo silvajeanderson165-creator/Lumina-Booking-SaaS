@@ -105,10 +105,12 @@ docker-compose exec web python backend/seed_subscriptions.py
 
 ---
 
-## 🤝 Autor
+## 👑 Autor
 
-**Jeanderson Silva 😎🤌**
+**Jeanderson Silva** 🤓✍️
 
-Construído desde o mapeamento de arquitetura até os deploys de nuvem, passando por infraestruturas robustas, otimização visual e SEO. 
+*Desenvolvedor Full-Stack | Engenheiro Frontend | Arquiteto de Software*
 
-Sinta-se à vontade para auditar as queries, explorar o código fonte ou testar a interatividade do Dashboard ao vivo!
+Construído desde o mapeamento de arquitetura de dados massivos (PostgreSQL + GraphQL) até a orquestração de contêineres Docker em nuvem, passando por pipelines CI/CD automatizados e uma interface analítica de nível corporativo.
+
+Sinta-se à vontade para auditar as queries GraphQL, explorar a lógica de processamento no banco relacional ou testar a interatividade do Dashboard ao vivo!
