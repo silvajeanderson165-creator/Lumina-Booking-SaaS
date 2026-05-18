@@ -1,6 +1,6 @@
 # Core
 Django>=4.2,<5.0
-psycopg2-binary>=2.9
+psycopg2-binary>=2.9.12
 
 # GraphQL
 graphene-django>=3.0
