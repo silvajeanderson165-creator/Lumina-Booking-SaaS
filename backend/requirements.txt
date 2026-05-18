@@ -7,7 +7,7 @@ graphene-django>=3.0
 django-graphql-jwt==0.3.4  # TODO: lib abandonada (último release 2020) — auditoria 2026-05-17 crítico #11
 
 # CORS
-django-cors-headers>=4.3
+django-cors-headers>=4.9.0
 
 # Dev tools — usados apenas em scripts standalone (seed_subscriptions.py).
 # TODO: mover para requirements-dev.txt em Sessão futura.
