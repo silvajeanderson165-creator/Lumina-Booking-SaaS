@@ -4,11 +4,6 @@ interface ProtectedRouteProps {
   children: React.ReactNode;
 }
 
-// Token literal usado pelo "MODO PORTFÓLIO" (bypass intencional de registro em Login.tsx:35).
-// É público de propósito — qualquer visitante pode entrar pelo demo. Validação JWT abaixo é
-// para tokens reais; este literal é uma exceção explícita para o showcase.
-const PORTFOLIO_DEMO_TOKEN = 'lumina_portfolio_demo';
-
 /**
  * Decodifica payload de um JWT sem validar assinatura (validação real é no backend).
  * Aqui só precisamos do `exp` para impedir uso de token vencido no client.
@@ -32,14 +27,16 @@ function decodeJwtPayload(token: string): { exp?: number } | null {
  * Auditoria 2026-05-17, crítico #3 (item 39B novo do checklist):
  * o guard anterior aceitava QUALQUER string truthy — bypass trivial com
  * `localStorage.setItem('lumina_token','x')` no console.
+ *
+ * Auditoria 2026-05-18, discrepância #3:
+ * a primeira correção mantinha uma exceção hardcoded para o token
+ * 'lumina_portfolio_demo' — violava o próprio item 39B que prescreve
+ * "isolar modo demo em rota separada". Solução: rota `/demo` com
+ * `DemoRoute` próprio. Este componente agora não tem NENHUMA exceção
+ * para token literal — só aceita JWT válido com `exp` futuro.
  */
-function isTokenValid(token: string | null): boolean {
+function isJwtValid(token: string | null): boolean {
   if (!token) return false;
-
-  // Exceção explícita: token do modo portfólio é aceito sem validação JWT.
-  if (token === PORTFOLIO_DEMO_TOKEN) return true;
-
-  // Token real precisa ser JWT válido e não-expirado.
   const payload = decodeJwtPayload(token);
   if (!payload || typeof payload.exp !== 'number') return false;
   return payload.exp * 1000 > Date.now();
@@ -48,7 +45,7 @@ function isTokenValid(token: string | null): boolean {
 export default function ProtectedRoute({ children }: ProtectedRouteProps) {
   const token = localStorage.getItem('lumina_token');
 
-  if (!isTokenValid(token)) {
+  if (!isJwtValid(token)) {
     // Token inválido/expirado: limpa storage e manda pra auth.
     if (token) localStorage.removeItem('lumina_token');
     return <Navigate to="/auth" replace />;

@@ -1,8 +1,12 @@
 """
-Django settings for core project.
-═══════════════════════════════════════════════════════
-🛡️ PROTOCOLO DE SEGURANÇA ENTERPRISE — LUMINA ANALYTICS
-═══════════════════════════════════════════════════════
+Django settings for the Lumina Analytics Engine.
+
+Camadas de segurança configuradas neste arquivo (ver docs/AUDIT_REPORT_*.md):
+  - Fail-fast em SECRET_KEY, POSTGRES_USER e POSTGRES_PASSWORD (sem fallback).
+  - Headers HTTP de segurança: HSTS, nosniff, X-Frame-Options=DENY, Referrer-Policy.
+  - Cookies httpOnly + Secure + SameSite=Strict em prod.
+  - JWT com algoritmo explícito (HS256) + expiração curta.
+  - SECURE_PROXY_SSL_HEADER reconhece terminador TLS upstream (Caddy).
 """
 import os
 from pathlib import Path
@@ -89,13 +93,28 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'core.wsgi.application'
 
+# Auditoria 2026-05-18, discrepância #1 (item 5C):
+# Fail-fast em TODAS as camadas. docker-compose.prod.yml já exige as envs via
+# ${VAR:?required}, mas o settings.py também precisa falhar — porque alguém
+# pode rodar o Django sem docker-compose (k8s, Heroku, Railway, outro orquestrador)
+# e o fallback antigo ('postgres_password') deixava subir com senha conhecida.
+# Em DEV o docker-compose.yml seta valores explícitos — então mesmo aqui a env existe.
+_POSTGRES_USER = os.environ.get('POSTGRES_USER')
+_POSTGRES_PASSWORD = os.environ.get('POSTGRES_PASSWORD')
+if not _POSTGRES_USER or not _POSTGRES_PASSWORD:
+    raise ValueError(
+        "[SEGURANÇA] POSTGRES_USER e POSTGRES_PASSWORD são obrigatórios. "
+        "Em dev, defina no docker-compose.yml; em prod, no docker-compose.prod.yml "
+        "(ou no orquestrador equivalente). NÃO existe valor default seguro."
+    )
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('POSTGRES_DB', 'lumina_analytics'),
-        'USER': os.environ.get('POSTGRES_USER', 'postgres'),
-        'PASSWORD': os.environ.get('POSTGRES_PASSWORD', 'postgres_password'),
-        'HOST': os.environ.get('POSTGRES_HOST', 'db'),
+        'NAME': os.environ.get('POSTGRES_DB', 'lumina_analytics'),  # nome pode ter default seguro
+        'USER': _POSTGRES_USER,
+        'PASSWORD': _POSTGRES_PASSWORD,
+        'HOST': os.environ.get('POSTGRES_HOST', 'db'),  # host interno do compose
         'PORT': os.environ.get('POSTGRES_PORT', '5432'),
     }
 }
@@ -124,6 +143,11 @@ SECURE_BROWSER_XSS_FILTER = True
 
 # [SEGURANÇA] Impede Content-Type Sniffing
 SECURE_CONTENT_TYPE_NOSNIFF = True
+
+# [SEGURANÇA] Referrer-Policy — limita info de origem em navegação cross-site.
+# Auditoria 2026-05-18, achado novo #B: Caddy já aplica em prod, mas em dev
+# (sem Caddy) o header sumia. Aqui o Django garante em qualquer ambiente.
+SECURE_REFERRER_POLICY = 'strict-origin-when-cross-origin'
 
 # [SEGURANÇA] X-Frame-Options — Impede clickjacking (iframes maliciosos)
 X_FRAME_OPTIONS = 'DENY'

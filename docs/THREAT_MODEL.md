@@ -99,13 +99,18 @@ Ver ADRs:
 
 ## Riscos residuais conhecidos
 
-Itens que CONTINUAM em 🔴/🟠 mesmo após a auditoria 2026-05-17 (sem mitigação ainda):
+Itens que CONTINUAM em 🔴/🟠 mesmo após as auditorias (sem mitigação ainda):
 
 1. **`django-graphql-jwt==0.3.4`** — lib abandonada (último release 2020). Substituição planejada como ADR futura.
 2. **Audit log de login** — não implementado (item 34 do checklist).
 3. **Testes pytest reais** — só scripts ad-hoc hoje (item 16).
-4. **CSP no frontend** — `vercel.json` ainda sem headers de segurança.
-5. **Rate limit in-memory** (E6) — quebra com múltiplas instâncias. OK enquanto single-instance.
+4. **Rate limit in-memory** (E6) — quebra com múltiplas instâncias. OK enquanto single-instance.
+5. **`csrf_exempt` no endpoint GraphQL** (auditoria 2026-05-18 discrepância #2) — hoje seguro porque a auth é via JWT no header `Authorization` (não via cookie de sessão Django). Vira problema quando:
+   - Multi-tenant chegar (ADR-001) e a sessão Django for usada
+   - JWT migrar para cookie httpOnly (ADR-002 expira) — cookie automático = CSRF possível
+   Remover `csrf_exempt` e implementar `X-CSRFToken` em mutations nessa hora.
+6. **CSP com `'unsafe-inline'` em `script-src`** (auditoria 2026-05-18 achado #A) — ver [ADR-003](adr/ADR-003-csp-unsafe-inline.md). Defesas em profundidade ativas em volta. Substituir por nonces via plugin Vite quando sair de portfólio.
+7. **`customer_id` aleatório por Subscription** (auditoria 2026-05-18 achado #C) — defeito conceitual: churn e LTV não somam por cliente real. Introduzir entidade `Customer` junto com multi-tenant (ADR-001).
 
 ## Quando revisitar este threat model
 

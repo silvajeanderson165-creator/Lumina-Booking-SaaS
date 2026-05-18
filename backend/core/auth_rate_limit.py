@@ -27,15 +27,28 @@ RATE_LIMIT_MAX_ATTEMPTS = 10    # máximo 10 tentativas / IP / janela
 
 def _client_ip(request) -> str:
     """
-    Extrai o IP do cliente respeitando `X-Forwarded-For` quando atrás de proxy.
+    Extrai o IP confiável do cliente.
 
-    Quando houver reverse proxy (item 10 da auditoria — Caddy/Traefik/nginx),
-    confiar APENAS no IP do proxy via SECURE_PROXY_SSL_HEADER. Como ainda não
-    há proxy configurado, usa REMOTE_ADDR direto.
+    ⚠️ Auditoria 2026-05-18, crítico #1 (item 23B novo): NÃO ler `X-Forwarded-For`
+    cru — qualquer atacante pode mandar `curl -H 'X-Forwarded-For: 1.2.3.4' ...`
+    e zerar o rate limit a cada request. Bug clássico de "rate limit que parece
+    funcionar mas é teatro".
+
+    Estratégia correta com Caddy como único proxy:
+      - Caddy injeta `X-Real-IP` com o IP do cliente direto (não-fakeável porque
+        Caddy é o ponto de entrada — sobrescreve qualquer X-Real-IP que venha
+        do cliente).
+      - Em dev (sem proxy), cai no REMOTE_ADDR.
+
+    Quando adicionar CDN na frente do Caddy (Cloudflare, etc.), trocar para o
+    header específico do CDN (`CF-Connecting-IP` no caso da Cloudflare) — esses
+    headers também não são fakeáveis porque o CDN sobrescreve.
     """
-    forwarded = request.META.get("HTTP_X_FORWARDED_FOR")
-    if forwarded:
-        return forwarded.split(",")[0].strip()
+    # Caddy seta X-Real-IP confiável (ver infra/Caddyfile). Cliente NÃO consegue forjar.
+    real_ip = request.META.get("HTTP_X_REAL_IP")
+    if real_ip:
+        return real_ip.strip()
+    # Sem proxy (dev local) — REMOTE_ADDR é o IP direto do cliente.
     return request.META.get("REMOTE_ADDR", "unknown")
 
 

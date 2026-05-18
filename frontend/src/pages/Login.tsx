@@ -29,11 +29,16 @@ export default function Login() {
     setIsLoading(true);
     setError(null);
 
-    // MODO PORTFÓLIO: Bypass de Criação de Conta
+    // MODO PORTFÓLIO: visitante explora o dashboard sem cadastro real.
+    // Auditoria 2026-05-18 discrepância #3 + checklist item 39B:
+    // - NÃO seta token JWT falso em localStorage (antes era 'lumina_portfolio_demo').
+    // - Ativa flag em sessionStorage (por aba; fecha aba = sai do demo).
+    // - Navega para /demo (rota isolada com DemoRoute próprio).
+    // - O dashboard real (/dashboard) continua exigindo JWT válido.
     if (isRegister) {
       setTimeout(() => {
-        localStorage.setItem('lumina_token', 'lumina_portfolio_demo');
-        navigate('/dashboard');
+        sessionStorage.setItem('lumina_demo_mode', '1');
+        navigate('/demo');
       }, 1500);
       return;
     }

@@ -21,11 +21,20 @@
 
     # Proxy para o gunicorn na rede interna.
     # Caddy injeta automaticamente: X-Forwarded-For, X-Forwarded-Proto=https, X-Real-IP.
+    #
+    # ⚠️ Auditoria 2026-05-18 crítico #1 (item 23B novo):
+    # Caddy SOBRESCREVE X-Real-IP e X-Forwarded-For com o IP real do cliente,
+    # ignorando qualquer valor que o cliente tenha enviado nesses headers.
+    # Isso torna X-Real-IP confiável para o rate limit em auth_rate_limit.py.
+    # NUNCA remover esse comportamento — o app passa a confiar em header fakeável.
     reverse_proxy web:8000 {
         # Timeout generoso para queries analíticas pesadas (dashboard com aggregate).
         transport http {
             read_timeout 60s
         }
+        # Garante que headers de IP venham só do Caddy, não do cliente.
+        header_up X-Real-IP {remote_host}
+        header_up X-Forwarded-For {remote_host}
     }
 
     # Logs estruturados (JSON) — facilita ingestão em SIEM/Loki/Cloudwatch.
