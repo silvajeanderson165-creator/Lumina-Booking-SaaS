@@ -1,0 +1,41 @@
+# Não copiar para a imagem (auditoria 2026-05-17, crítico #9).
+
+# Segredos
+.env
+*.env
+.env.*
+
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Python
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+*.egg-info
+.pytest_cache
+.venv
+venv
+env
+
+# IDE / OS
+.idea
+.vscode
+.DS_Store
+Thumbs.db
+
+# Logs / temp
+*.log
+.tmp
+tmp
+
+# Scripts standalone — não precisam ir pra imagem de runtime.
+test_graphql.py
+test_graphql_full.py
+
+# Docs / internos
+docs
+README.md

@@ -1,17 +1,23 @@
 name: Deploy Backend to IaaS
 
+# Deploy só roda DEPOIS do CI passar (auditoria 2026-05-17, crítico #12).
+# Gate via workflow_run aguardando "CI" do ci.yml concluir com sucesso.
+
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - 'backend/**'
-      - 'docker-compose.prod.yml'
+  workflow_run:
+    workflows: ["CI"]
+    types: [completed]
+    branches: [main]
+
+permissions:
+  contents: read
 
 jobs:
   deploy:
     name: Deploy to Production VM (EC2/Droplet)
     runs-on: ubuntu-latest
+    # Só prossegue se o CI passou.
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
 
     steps:
       - name: Checkout Code
@@ -24,18 +30,21 @@ jobs:
           username: ${{ secrets.PROD_SERVER_USER }}
           key: ${{ secrets.PROD_SSH_PRIVATE_KEY }}
           script: |
+            set -euo pipefail
             cd /opt/lumina-saas
-            # O repositório já deve estar clonado no servidor. Puxa as atualizações:
+
+            # TODO (Sessão futura): trocar 'git pull' por deploy via tag/release
+            # (item 14 do plano de ação). Padrão atual é frágil — rollback é manual.
             git pull origin main
-            
-            # Reconstrói a imagem sem downtime agressivo, mas garantindo atualização
+
+            # Reconstrói a imagem
             docker-compose -f docker-compose.prod.yml build
-            
-            # Recria contêineres que tiveram alterações. 'up -d' lidará com down e up
+
+            # Recria contêineres que tiveram alterações
             docker-compose -f docker-compose.prod.yml up -d
-            
-            # Executa as migrações (se houver) automáticas diretamente no gunicorn container
+
+            # Executa as migrações automáticas
             docker-compose -f docker-compose.prod.yml exec -T web python manage.py migrate --noinput
-            
-            # Limpeza de imagens Docker sem uso (Dangling) para poupar disco da Droplet (ex de VLAEG autocura)
+
+            # Limpeza de imagens dangling para poupar disco
             docker image prune -f

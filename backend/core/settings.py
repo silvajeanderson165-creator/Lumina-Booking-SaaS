@@ -138,6 +138,12 @@ if not DEBUG:
     SESSION_COOKIE_SECURE = True
     SESSION_COOKIE_HTTPONLY = True
 
+    # Reconhece o terminador TLS upstream (Caddy em docker-compose.prod.yml).
+    # Caddy seta X-Forwarded-Proto=https quando o request chega via TLS.
+    # Sem isso + SECURE_SSL_REDIRECT=True, o Django entraria em loop de redirect
+    # (auditoria 2026-05-17, crítico #10 + Sessão 5 item 10).
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 # [SEGURANÇA] SameSite explícito para cookies — mitiga CSRF.
 # 'Strict' = nunca enviado em navegação cross-site (proteção máxima).
 # Usar 'Lax' apenas se houver fluxo legítimo de navegação cross-site (ex: OAuth callback).
@@ -157,12 +163,20 @@ GRAPHENE = {
     ],
 }
 
-# [SEGURANÇA] JWT com expiração curta (15 minutos)
+# [SEGURANÇA] JWT — expiração curta + allowlist explícita de algoritmo.
+# Auditoria 2026-05-17, item 6B do checklist universal:
+#   - JWT_ALGORITHM explícito (HS256) — rejeita alg: none e algorithm confusion attacks.
+#   - JWT_LEEWAY zerado (sem tolerância de tempo na verificação de exp).
+#   - JWT_AUDIENCE não usado aqui — adicionar quando houver múltiplos serviços validando.
+# TODO (Sessão futura): substituir django-graphql-jwt==0.3.4 (lib abandonada, último release 2020)
+# por strawberry-django ou JWT próprio. Crítico #11 da auditoria 2026-05-17.
 GRAPHQL_JWT = {
+    'JWT_ALGORITHM': 'HS256',
     'JWT_EXPIRATION_DELTA': timedelta(minutes=15),
     'JWT_REFRESH_EXPIRATION_DELTA': timedelta(days=7),
     'JWT_VERIFY': True,
     'JWT_VERIFY_EXPIRATION': True,
+    'JWT_LEEWAY': 0,
 }
 
 AUTHENTICATION_BACKENDS = [

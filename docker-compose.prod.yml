@@ -17,33 +17,60 @@ services:
       - lumina_prod_network
 
   web:
-    build: 
+    build:
       context: ./backend
       dockerfile: Dockerfile
     container_name: lumina_django_backend_prod
-    command: gunicorn core.wsgi:application --bind 0.0.0.0:8000 --workers 3 --threads 2
+    # CMD do Dockerfile já roda gunicorn — não sobrescrever aqui.
     volumes:
       - static_volume:/app/staticfiles
-      # IMPORTANTE: Sem mapeamento direto de código (./backend:/app) em produção! 
+      # IMPORTANTE: Sem mapeamento direto de código (./backend:/app) em produção!
       # O código foi "bakado" dentro da imagem durante o build do CI/CD.
-    ports:
-      - "8000:8000"
+    # ⚠️ NÃO expor porta diretamente ao host em produção (auditoria 2026-05-17, crítico #10).
+    # Caddy abaixo termina TLS e faz proxy via rede interna.
+    expose:
+      - "8000"
     environment:
       # Fail-fast em todas as envs sensíveis (sem defaults inseguros).
-      # SECRET_KEY já era exigida; ALLOWED_HOSTS e credenciais do banco agora também.
       - SECRET_KEY=${PROD_SECRET_KEY:?PROD_SECRET_KEY obrigatório em produção}
       - DEBUG=False # Crítico na AWS/Droplet
       - ALLOWED_HOSTS=${ALLOWED_PROD_HOSTS:?ALLOWED_PROD_HOSTS obrigatório (NUNCA usar * em produção)}
       - DATABASE_URL=postgres://${PROD_DB_USER}:${PROD_DB_PASSWORD}@db:5432/lumina_prod
+      # Diz ao Django que o request é HTTPS quando o Caddy seta X-Forwarded-Proto=https.
+      - SECURE_PROXY_SSL_HEADER_NAME=HTTP_X_FORWARDED_PROTO
     depends_on:
       - db
     restart: always
     networks:
       - lumina_prod_network
 
+  # Reverse proxy com auto-HTTPS (Let's Encrypt) — auditoria 2026-05-17, crítico #10.
+  # Termina TLS na borda, faz proxy para o gunicorn pela rede interna.
+  # Configurar o domínio em PROD_DOMAIN (ex: lumina-saas.com).
+  caddy:
+    image: caddy:2-alpine
+    container_name: lumina_caddy_prod
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"  # HTTP/3
+    volumes:
+      - ./infra/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data       # certificados Let's Encrypt persistidos aqui
+      - caddy_config:/config
+    environment:
+      - PROD_DOMAIN=${PROD_DOMAIN:?PROD_DOMAIN obrigatório (ex: lumina-saas.com)}
+    depends_on:
+      - web
+    networks:
+      - lumina_prod_network
+
 volumes:
   postgres_prod_data:
   static_volume:
+  caddy_data:
+  caddy_config:
 
 networks:
   lumina_prod_network:

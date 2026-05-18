@@ -1,0 +1,36 @@
+# Caddyfile — reverse proxy com auto-HTTPS para o Lumina backend.
+# Auditoria 2026-05-17, crítico #10: backend deixa de expor :8000 direto ao host.
+# Caddy termina TLS (Let's Encrypt) e faz proxy para o gunicorn via rede interna.
+#
+# Variável PROD_DOMAIN é exigida via ${VAR:?...} no docker-compose.prod.yml.
+
+{$PROD_DOMAIN} {
+    # Auto-HTTPS via Let's Encrypt (Caddy default).
+
+    # Headers de segurança aplicados pelo proxy (defesa em profundidade
+    # mesmo que o Django também os configure).
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "DENY"
+        Referrer-Policy "strict-origin-when-cross-origin"
+        Permissions-Policy "geolocation=(), microphone=(), camera=()"
+        # Remove server fingerprinting
+        -Server
+    }
+
+    # Proxy para o gunicorn na rede interna.
+    # Caddy injeta automaticamente: X-Forwarded-For, X-Forwarded-Proto=https, X-Real-IP.
+    reverse_proxy web:8000 {
+        # Timeout generoso para queries analíticas pesadas (dashboard com aggregate).
+        transport http {
+            read_timeout 60s
+        }
+    }
+
+    # Logs estruturados (JSON) — facilita ingestão em SIEM/Loki/Cloudwatch.
+    log {
+        output stdout
+        format json
+    }
+}
