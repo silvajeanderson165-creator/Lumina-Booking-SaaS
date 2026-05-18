@@ -10,7 +10,7 @@
 # ───────────────────────────────────────────────────────────────────────────────
 # Stage 1 — builder: compila as wheels com toolchain completa.
 # ───────────────────────────────────────────────────────────────────────────────
-FROM python:3.11-alpine AS builder
+FROM python:3.14-alpine AS builder
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
@@ -38,7 +38,7 @@ RUN pip install --upgrade pip && \
 # ───────────────────────────────────────────────────────────────────────────────
 # Stage 2 — runtime: imagem mínima, sem toolchain, com user não-root.
 # ───────────────────────────────────────────────────────────────────────────────
-FROM python:3.11-alpine AS runtime
+FROM python:3.14-alpine AS runtime
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
