@@ -228,6 +228,70 @@ O endpoint GraphQL é o único ponto de entrada da aplicação e por isso recebe
 
 ---
 
+## 🚀 Como Executar Localmente
+
+### Requisitos
+- Node.js 20+
+- npm 10+
+- Python 3.10+
+- Docker & Docker Compose (opcional, para rodar o banco PostgreSQL automaticamente)
+
+### Variáveis de ambiente
+
+Crie um `.env` na raiz do projeto a partir do `.env.example`:
+
+```dotenv
+POSTGRES_DB=lumina_db
+POSTGRES_USER=lumina_admin
+POSTGRES_PASSWORD=sua_senha_forte_aqui
+POSTGRES_HOST=localhost
+POSTGRES_PORT=5432
+
+SECRET_KEY=sua_chave_secreta_django_aqui
+DEBUG=True
+ALLOWED_HOSTS=localhost,127.0.0.1
+CORS_ORIGINS=http://localhost:5173,http://localhost:3000
+VITE_API_URL=http://localhost:8000/graphql
+```
+
+⚠️ **Nunca commite o `.env` ou chaves de produção no Git.**
+
+### Rodando
+
+1. **Banco de Dados (via Docker):**
+   ```bash
+   docker-compose up -d
+   ```
+
+2. **Backend (Django):**
+   ```bash
+   cd backend
+   # Crie e ative seu ambiente virtual (venv)
+   python -m venv venv
+   # No Windows:
+   .\venv\Scripts\activate
+   # No Linux/Mac:
+   source venv/bin/activate
+
+   pip install -r requirements.txt
+   python manage.py migrate
+   python manage.py runserver     # executando em http://localhost:8000
+   ```
+
+3. **Frontend (Vite):**
+   ```bash
+   cd frontend
+   npm install
+   npm run dev     # executando em http://localhost:5173
+   ```
+
+4. **Marketing Site:**
+   ```bash
+   cd marketing-site
+   npm install
+   npm run dev     # executando em http://localhost:3000
+   ```
+
 ## 👑 Autor
 
 **Jeanderson Silva** 🤓✍️
