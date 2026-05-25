@@ -1,5 +1,5 @@
 # Core
-Django>=4.2,<5.0
+Django>=6.0.5,<7.0
 psycopg2-binary>=2.9
 
 # GraphQL
